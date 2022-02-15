@@ -31,9 +31,10 @@ const getScriptPathFromHTML = (html: string, origin: string) => {
   try {
     filePath = getFirstCapturingGroup(regExp, html);
   } catch {
-    throw new Error(
-      "The src attribute of the 'styles*.js' file could not be found!"
-    );
+    return "";
+    // throw new Error(
+    //   "The src attribute of the 'styles*.js' file could not be found!"
+    // );
   }
   return getURL(origin, filePath);
 };
@@ -192,8 +193,10 @@ export async function generatePdf(
   }
 
   await page.setContent(htmlList.join("\n"));
-  await page.addStyleTag({ url: stylePath });
-  await page.addScriptTag({ url: scriptPath });
+  await page.addStyleTag({ url: stylePath ? stylePath : "" });
+  if (scriptPath) {
+    await page.addScriptTag({ url: scriptPath });
+  }
   await page.pdf({
     path: filename,
     format: "A4",
