@@ -121,7 +121,7 @@ export async function generatePdf(
 
     try {
       nextPageUrl = await page.$eval(
-        ".pagination-nav__item--next > a",
+        ".pagination-nav__link--next",
         (element) => {
           return (element as HTMLLinkElement).href;
         }
@@ -130,7 +130,7 @@ export async function generatePdf(
       nextPageUrl = "";
     }
 
-    let html = await page.$eval("article", (element) => {
+    let html = await page.$eval(".theme-doc-markdown", (element) => {
       return element.outerHTML;
     });
 
@@ -160,8 +160,8 @@ export async function generatePdf(
         });
 
         const text = str.replace(/<h[1-6].*?>/g, (header) => {
-          if (header.match(/id( )*=( )*"/g)) {
-            return header.replace(/id( )*=( )*"/g, `id="${headerId} `);
+          if (header.match(/id( )*=( )*".*"/g)) {
+            return header.replace(/id( )*=( )*".*"/g, `id="${headerId} `);
           } else {
             return (
               header.substring(0, header.length - 1) + ` id="${headerId}">`
