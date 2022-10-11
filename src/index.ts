@@ -144,32 +144,34 @@ export async function generatePdf(
 
     if (tocLocation !== null) {
       // parse headers in html for table of contents
-      html = html.replace(/<h[1-6](.+?)<\/h[1-6]( )*>/g, (str) => {
-        // docusaurus inserts #s into headers for direct links to the header
-        const headerText = str
-          .replace(/<a[^>]*>#<\/a( )*>/g, "")
-          .replace(/<[^>]*>/g, "")
-          .trim();
-        const headerId = `${Math.random().toString(36).substr(2, 5)}-${
-          headers.length
-        }`;
-        headers.push({
-          header: headerText,
-          level: Number(str[str.indexOf("h") + 1]),
-          id: headerId,
-        });
+      html = html
+        .replace(/<h[1-6](.+?)<\/h[1-6]( )*>/g, (str) => {
+          // docusaurus inserts #s into headers for direct links to the header
+          const headerText = str
+            .replace(/<a[^>]*>#<\/a( )*>/g, "")
+            .replace(/<[^>]*>/g, "")
+            .trim();
+          const headerId = `${Math.random().toString(36).substr(2, 5)}-${
+            headers.length
+          }`;
+          headers.push({
+            header: headerText,
+            level: Number(str[str.indexOf("h") + 1]),
+            id: headerId,
+          });
 
-        const text = str.replace(/<h[1-6].*?>/g, (header) => {
-          if (header.match(/id( )*=( )*".*"/g)) {
-            return header.replace(/id( )*=( )*".*"/g, `id="${headerId} `);
-          } else {
-            return (
-              header.substring(0, header.length - 1) + ` id="${headerId}">`
-            );
-          }
-        });
-        return text;
-      });
+          const text = str.replace(/<h[1-6].*?>/g, (header) => {
+            if (header.match(/id( )*=( )*".*"/g)) {
+              return header.replace(/id( )*=( )*".*"/g, `id="${headerId}"`);
+            } else {
+              return (
+                header.substring(0, header.length - 1) + ` id="${headerId}">`
+              );
+            }
+          });
+          return text;
+        })
+        .replace(/loading="lazy"/g, "");
     }
 
     htmlList.push(html);
